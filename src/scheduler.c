@@ -51,9 +51,9 @@ static void brocard_scheduler_dispatch_thread(struct brocard_scheduler *schedule
 				scheduler->steps[i].busy = true;
 				pthread_create(&scheduler->steps[i].thread_id, NULL, brocard_scheduler_compute, &scheduler->steps[i]);
 				pthread_mutex_unlock(&scheduler->steps[i].lock);
-				printf("Dispatch: thread %i given range %lli-%lli\n",
+				/*printf("Dispatch: thread %i given range %lli-%lli\n",
 					i, (scheduler->progress * SCHEDULER_WORK_GROUP_AMOUNT),
-					(scheduler->progress * SCHEDULER_WORK_GROUP_AMOUNT) + SCHEDULER_WORK_GROUP_AMOUNT);
+					(scheduler->progress * SCHEDULER_WORK_GROUP_AMOUNT) + SCHEDULER_WORK_GROUP_AMOUNT);*/
 
 				return;
 			}
