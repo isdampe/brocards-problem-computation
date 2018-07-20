@@ -28,8 +28,7 @@ int main(int argc, char **argv)
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
 	brocard_scheduler_free(&scheduler);
 
-	double t_ns = ((double)(end_time.tv_sec - start_time.tv_sec) * 1.0e9 +
-		(double)(end_time.tv_nsec - start_time.tv_nsec)) / 1000000000;
+	double t_ns = ((double)(end_time.tv_nsec - start_time.tv_nsec) / 1000000000);
 
 	printf("Took %f seconds\n", t_ns);
 
