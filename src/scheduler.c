@@ -126,6 +126,9 @@ void brocard_scheduler_loop(struct brocard_scheduler *scheduler)
 		brocard_scheduler_dispatch_thread(scheduler);
 		scheduler->progress++;
 
+		printf("%llu of %llu\r", scheduler->progress * SCHEDULER_WORK_GROUP_AMOUNT, scheduler->upper_bound);
+		fflush(stdout);
+
 		if ((scheduler->progress - (2 * scheduler->num_threads)) > 0)
 			brocard_write_progress_persist(scheduler);
 	}
