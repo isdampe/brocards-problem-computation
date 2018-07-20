@@ -44,9 +44,9 @@ static void brocard_auto_restore(struct brocard_scheduler *scheduler)
 			active_ptr = upb_bfr;
 			idx = 0;
 		} else {
-        	active_ptr[idx++] = c;
-        	active_ptr[idx] = '\0';
-        }
+			active_ptr[idx++] = c;
+			active_ptr[idx] = '\0';
+		}
 
 	}
 
