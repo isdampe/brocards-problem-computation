@@ -1,6 +1,7 @@
 #include <gmp.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <pthread.h>
 #include "brocard.h"
 
 static void brocard_step_init(struct brocard_step *step)
@@ -50,11 +51,11 @@ static bool brocard_compute_sqrt(mpz_t m, mpz_t n)
 
 static void brocard_out_result(struct brocard_step *step)
 {
-	printf("------------------------------\nRESULT: ");
-	printf("N = %llu", step->n_init);
-	printf(", M = ");
-	mpz_out_str(stdout, 10, step->m);
-	printf("\n-------------------------------\n");
+	char n[100];
+	char m[100];
+	sprintf(n, "%llu", step->n_init);
+	gmp_sprintf(m, "%Zd", step->m);
+	brocard_write_result(n, m);
 }
 
 bool brocard_step_process(struct brocard_step *step)
@@ -68,5 +69,15 @@ bool brocard_step_process(struct brocard_step *step)
 
 //	brocard_step_free(step);
 	return false;
+}
+
+
+static void brocard_write_result(const char *n, const char *m)
+{
+	pthread_mutex_lock(&rslt_file_lock);
+	FILE *fh = fopen("results.txt", "a");
+	fprintf(fh, "n=%s, m=%s\n", n, m);
+	fclose(fh);
+	pthread_mutex_unlock(&rslt_file_lock);
 }
 
