@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 		usage();
 
 	struct brocard_scheduler scheduler;
-	brocard_scheduler_init(&scheduler, thread_count, 10000);
+	brocard_scheduler_init(&scheduler, thread_count, 10000, 0);
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
 	brocard_scheduler_loop(&scheduler);
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);

@@ -6,11 +6,11 @@
 #include <unistd.h>
 #include "scheduler.h"
 
-void brocard_scheduler_init(struct brocard_scheduler *scheduler, const int num_threads, unsigned long long upper_bound)
+void brocard_scheduler_init(struct brocard_scheduler *scheduler, const int num_threads, const unsigned long long upper_bound, const unsigned long long start_at)
 {
 	scheduler->num_threads = num_threads;
 	scheduler->upper_bound = upper_bound;
-	scheduler->progress = 0;
+	scheduler->progress = start_at / SCHEDULER_WORK_GROUP_AMOUNT;
 
 	brocard_auto_restore(scheduler);
 
@@ -34,31 +34,31 @@ static void brocard_auto_restore(struct brocard_scheduler *scheduler)
 		return;
 
 	char c = '\0';
-	char prg_bfr[sizeof(unsigned long long) + 1];
-	char upb_bfr[sizeof(unsigned long long) + 1];
+	char prg_bfr[21];
+	char upb_bfr[21];
 	char *active_ptr = prg_bfr;
 	int idx = 0;
+	unsigned long long progress = 0, upper_bound;
 
 	while ((c = getc(fh)) != EOF) {
 		if (c == ':') {
+			progress = atoll(active_ptr);
 			active_ptr = upb_bfr;
 			idx = 0;
 		} else {
 			active_ptr[idx++] = c;
 			active_ptr[idx] = '\0';
 		}
-
 	}
 
 	fclose(fh);
 
-	unsigned long long progress = atoi(prg_bfr);
-	unsigned long long upper_bound = atoi(upb_bfr);
+	upper_bound = atoll(upb_bfr);
 	
 	if (upper_bound == 0)
 		return;
 
-	scheduler->progress = progress / SCHEDULER_WORK_GROUP_AMOUNT;
+	scheduler->progress = (progress / SCHEDULER_WORK_GROUP_AMOUNT) - (scheduler->num_threads + 1);
 	scheduler->upper_bound = upper_bound;
 
 	printf("Restoring previous session from progress.lock...\n");
@@ -74,7 +74,7 @@ void brocard_scheduler_free(struct brocard_scheduler *scheduler)
 	unlink("progress.lock");
 }
 
-static void *brocard_scheduler_compute(struct brocard_thread *thread)
+static void brocard_scheduler_compute(struct brocard_thread *thread)
 {
 
 	unsigned long long end = thread->step.n_init + SCHEDULER_WORK_GROUP_AMOUNT;
@@ -102,7 +102,7 @@ static void brocard_scheduler_dispatch_thread(struct brocard_scheduler *schedule
 				pthread_mutex_lock(&scheduler->steps[i].lock);
 				scheduler->steps[i].step.n_init = scheduler->progress * SCHEDULER_WORK_GROUP_AMOUNT;
 				scheduler->steps[i].busy = true;
-				pthread_create(&scheduler->steps[i].thread_id, NULL, brocard_scheduler_compute, &scheduler->steps[i]);
+				pthread_create(&scheduler->steps[i].thread_id, NULL, (void *)brocard_scheduler_compute, &scheduler->steps[i]);
 				pthread_mutex_unlock(&scheduler->steps[i].lock);
 				/*printf("Dispatch: thread %i given range %lli-%lli\n",
 					i, (scheduler->progress * SCHEDULER_WORK_GROUP_AMOUNT),

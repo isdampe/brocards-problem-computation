@@ -22,7 +22,7 @@ struct brocard_scheduler {
 	int results;
 };
 
-void brocard_scheduler_init(struct brocard_scheduler *scheduler, const int num_threads, unsigned long long upper_bound);
+void brocard_scheduler_init(struct brocard_scheduler *scheduler, const int num_threads, const unsigned long long upper_bound, const unsigned long long start_at);
 static void brocard_auto_restore(struct brocard_scheduler *scheduler);
 void brocard_scheduler_free(struct brocard_scheduler *scheduler);
 static void brocard_scheduler_dispatch_thread(struct brocard_scheduler *scheduler);
