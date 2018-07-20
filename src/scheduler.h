@@ -6,6 +6,8 @@
 
 #define SCHEDULER_WORK_GROUP_AMOUNT 10
 
+static pthread_mutex_t rslt_file_lock;
+
 struct brocard_thread {
 	pthread_t thread_id;
 	pthread_mutex_t lock;
@@ -18,11 +20,14 @@ struct brocard_scheduler {
 	struct brocard_thread *steps;
 	unsigned long long upper_bound;
 	unsigned long long progress;
+	FILE *prg_fh;
 };
 
 void brocard_scheduler_init(struct brocard_scheduler *scheduler, const int num_threads, unsigned long long upper_bound);
+static void brocard_auto_restore(struct brocard_scheduler *scheduler);
 void brocard_scheduler_free(struct brocard_scheduler *scheduler);
 static void brocard_scheduler_dispatch_thread(struct brocard_scheduler *scheduler);
+static void brocard_write_progress_persist(const struct brocard_scheduler *scheduler);
 void brocard_scheduler_loop(struct brocard_scheduler *scheduler);
 
 #endif

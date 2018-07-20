@@ -66,7 +66,7 @@ bool brocard_step_process(struct brocard_step *step)
 	if (brocard_compute_sqrt(step->m, step->n) == true)
 		brocard_out_result(step);
 
-	brocard_step_free(step);
+//	brocard_step_free(step);
 	return false;
 }
 
